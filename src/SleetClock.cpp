@@ -1,6 +1,7 @@
+#include "SleetClock.h"
 #include <Wire.h>
 #include "Adafruit-PWM-Servo-Driver-Library/Adafruit_PWMServoDriver.h"
-#include "SleetClock.h"
+#include "IndieBlocks/ESP32/ESP32_encoder.h"
 
 SleetClock::SleetClock() {
     pwm = Adafruit_PWMServoDriver();
@@ -8,6 +9,9 @@ SleetClock::SleetClock() {
     pwm.setPWMFreq(1000);
     Wire.setClock(400000);
     this->allOff();
+
+    encoder.risingSensitive = false;
+    encoder.init();
 }
 
 void SleetClock::analogWrite(uint8_t pcaPin, uint16_t value) {
