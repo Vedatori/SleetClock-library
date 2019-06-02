@@ -2,8 +2,12 @@
 #include <Wire.h>
 #include "Adafruit-PWM-Servo-Driver-Library/Adafruit_PWMServoDriver.h"
 #include "IndieBlocks/ESP32/ESP32_encoder.h"
+#include "OneWire/OneWire.h"
+#include "Arduino-Temperature-Control-Library/DallasTemperature.h"
 
-SleetClock::SleetClock() {
+SleetClock::SleetClock() {}
+
+void SleetClock::init() {
     pwm = Adafruit_PWMServoDriver();
     pwm.begin();
     pwm.setPWMFreq(1000);
@@ -12,6 +16,9 @@ SleetClock::SleetClock() {
 
     encoder.risingSensitive = false;
     encoder.init();
+
+    dallasTemp = DallasTemperature(&oneWireDS);
+    dallasTemp.begin();
 }
 
 void SleetClock::analogWrite(uint8_t pcaPin, uint16_t value) {

@@ -5,6 +5,8 @@
 #include <Wire.h>
 #include "Adafruit-PWM-Servo-Driver-Library/Adafruit_PWMServoDriver.h"
 #include "IndieBlocks/ESP32/ESP32_encoder.h"
+#include "OneWire/OneWire.h"
+#include "Arduino-Temperature-Control-Library/DallasTemperature.h"
 
 class SleetClock {
     Adafruit_PWMServoDriver pwm;
@@ -37,7 +39,10 @@ public:
     static const uint8_t button1 = 39;
 
     ESP32_encoder encoder = ESP32_encoder(encoderA, encoderB);
+    OneWire oneWireDS = OneWire(tempDHT);
+    DallasTemperature dallasTemp;
     SleetClock();
+    void init();
     void analogWrite(uint8_t pcaPin, uint16_t value);   //set PCA9685 connected devices power PWM in range 0(off)-4095(on)
     void allOff();  //turn off all external devices
 };
