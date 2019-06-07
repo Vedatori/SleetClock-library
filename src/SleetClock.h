@@ -3,10 +3,15 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include "Adafruit-PWM-Servo-Driver-Library/Adafruit_PWMServoDriver.h"
-#include "IndieBlocks/ESP32/ESP32_encoder.h"
-#include "OneWire/OneWire.h"
-#include "Arduino-Temperature-Control-Library/DallasTemperature.h"
+#include <Adafruit_PWMServoDriver.h>
+#include <ESP32/ESP32_encoder.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+
+#include <Adafruit_GFX.h>
+#include <Adafruit_PCD8544.h>
+
 
 class SleetClock {
     Adafruit_PWMServoDriver pwm;
@@ -28,7 +33,6 @@ public:
     static const uint8_t servo5 = 14;
     static const uint8_t servo6 = 15;
 
-
     static const uint8_t encoderSwitch = 17;
     static const uint8_t tempDHT = 16;
     static const uint8_t encoderA = 25;
@@ -37,14 +41,21 @@ public:
     static const uint8_t photoresistor = 35;
     static const uint8_t button0 = 36;
     static const uint8_t button1 = 39;
+    static const uint8_t displayCLK = 23;
+    static const uint8_t displayDIN = 19;
+    static const uint8_t displayDC = 28;
+    static const uint8_t displayCE = 5;
+    static const uint8_t displayRST = 32;
 
     ESP32_encoder encoder = ESP32_encoder(encoderA, encoderB);
     OneWire oneWireDS = OneWire(tempDHT);
     DallasTemperature dallasTemp;
+    Adafruit_PCD8544 *display;
     SleetClock();
     void init();
     void analogWrite(uint8_t pcaPin, uint16_t value);   //set PCA9685 connected devices power PWM in range 0(off)-4095(on)
     void allOff();  //turn off all external devices
+    void showOnDisplay();
 };
 
 #endif  //_SLEET_CLOCK_H
