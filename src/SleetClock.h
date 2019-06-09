@@ -7,10 +7,14 @@
 #include <ESP32/ESP32_encoder.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <U8g2lib.h>
 
-
-#include <Adafruit_GFX.h>
-#include <Adafruit_PCD8544.h>
+#ifdef U8X8_HAVE_HW_SPI
+#include <SPI.h>
+#endif
+#ifdef U8X8_HAVE_HW_I2C
+#include <Wire.h>
+#endif
 
 
 class SleetClock {
@@ -50,7 +54,7 @@ public:
     ESP32_encoder encoder = ESP32_encoder(encoderA, encoderB);
     OneWire oneWireDS = OneWire(tempDHT);
     DallasTemperature dallasTemp;
-    Adafruit_PCD8544 *display;
+    U8G2_PCD8544_84X48_F_4W_SW_SPI display = U8G2_PCD8544_84X48_F_4W_SW_SPI(U8G2_R0, /* clock=*/ 23, /* data=*/ 19, /* cs=*/ 5, /* dc=*/ 18, /* reset=*/ 32);  // Nokia 5110 Display
     SleetClock();
     void init();
     void analogWrite(uint8_t pcaPin, uint16_t value);   //set PCA9685 connected devices power PWM in range 0(off)-4095(on)
