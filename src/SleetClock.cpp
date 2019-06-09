@@ -23,6 +23,7 @@ void SleetClock::init() {
     dallasTemp = DallasTemperature(&oneWireDS);
     dallasTemp.begin();
     
+    display.begin();
 }
 
 void SleetClock::analogWrite(uint8_t pcaPin, uint16_t value) {
