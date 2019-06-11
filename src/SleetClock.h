@@ -5,6 +5,7 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <ESP32/ESP32_encoder.h>
+#include <ESP32/ESP32_touchBar.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <U8g2lib.h>
@@ -47,19 +48,26 @@ public:
     static const uint8_t button1 = 39;
     static const uint8_t displayCLK = 23;
     static const uint8_t displayDIN = 19;
-    static const uint8_t displayDC = 28;
+    static const uint8_t displayDC = 18;
     static const uint8_t displayCE = 5;
     static const uint8_t displayRST = 32;
 
+    static const uint8_t displayWidth = 84;
+    static const uint8_t displayHeight = 84; 
+
+    static const unsigned char logoVedatori[];   // Obtained using GIMP2 -> Export as .xbm with default settings
+
     ESP32_encoder encoder = ESP32_encoder(encoderA, encoderB);
+    ESP32_touchBar touchBar = ESP32_touchBar();
     OneWire oneWireDS = OneWire(tempDHT);
     DallasTemperature dallasTemp;
-    U8G2_PCD8544_84X48_F_4W_SW_SPI display = U8G2_PCD8544_84X48_F_4W_SW_SPI(U8G2_R0, /* clock=*/ 23, /* data=*/ 19, /* cs=*/ 5, /* dc=*/ 18, /* reset=*/ 32);  // Nokia 5110 Display
+    U8G2_PCD8544_84X48_F_4W_SW_SPI display = U8G2_PCD8544_84X48_F_4W_SW_SPI(U8G2_R0, displayCLK, displayDIN, displayCE, displayDC, displayRST);  // Nokia 5110 Display
     SleetClock();
     void init();
     void analogWrite(uint8_t pcaPin, uint16_t value);   //set PCA9685 connected devices power PWM in range 0(off)-4095(on)
     void allOff();  //turn off all external devices
     void showOnDisplay();
+    void drawLogo();
 };
 
 #endif  //_SLEET_CLOCK_H
