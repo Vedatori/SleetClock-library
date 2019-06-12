@@ -68,6 +68,7 @@ public:
     void allOff();  //turn off all external devices
     void showOnDisplay();
     void drawLogo();
+    void drawTimeTemps(struct tm timeNow, float inTemp, float outTemp);
 };
 
 #endif  //_SLEET_CLOCK_H
