@@ -44,16 +44,6 @@ void saveParamCallback(){
     Serial.println("PARAM coordinatesLongtitude = " + longitude);
 }
 
-
-/* weather definition */
-enum {
-    CLEAR_DAY = 0, CLEAR_NIGHT = 1, CLOUDY = 2,
-    RAIN = 3, HEAVY_RAIN = 4,
-    SNOW = 5, SLEET = 6, WIND = 7, FOG = 8,
-    PARTLY_CLOUDY_DAY = 9, PARTLY_CLOUDY_NIGHT = 10,
-    UNAVAILABLE = 11, OTHER = 12, INITIAL = 13,
-};
-
 void printInfo(void *arg) {
     int currentWeather[12], lastWeather[12];
     int currentPrecipProbability[12], lastPrecipProbability[12];

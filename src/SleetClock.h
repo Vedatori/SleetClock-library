@@ -17,9 +17,19 @@
 #include <Wire.h>
 #endif
 
+/* weather definition */
+enum Weather{
+    CLEAR_DAY = 0, CLEAR_NIGHT = 1, CLOUDY = 2,
+    RAIN = 3, HEAVY_RAIN = 4,
+    SNOW = 5, SLEET = 6, WIND = 7, FOG = 8,
+    PARTLY_CLOUDY_DAY = 9, PARTLY_CLOUDY_NIGHT = 10,
+    UNAVAILABLE = 11, OTHER = 12, INITIAL = 13,
+};
 
 class SleetClock {
     Adafruit_PWMServoDriver pwm;
+    Weather previousWeather;
+    unsigned animationStep = 0;
 public:
     static const uint8_t ligthningLED = 0;
     static const uint8_t flakesLED = 1;
@@ -69,6 +79,8 @@ public:
     void showOnDisplay();
     void drawLogo();
     void drawTimeTemps(struct tm timeNow, float inTemp, float outTemp);
+    void showWeatherOnLeds(Weather weather);
+    void setAllWeatherLedsToZero();
 };
 
 #endif  //_SLEET_CLOCK_H

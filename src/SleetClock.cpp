@@ -4,7 +4,7 @@
 #include <ESP32/ESP32_encoder.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-
+#include <time.h>
 
 
 SleetClock::SleetClock() {}
@@ -63,6 +63,136 @@ void SleetClock::drawTimeTemps(struct tm timeNow, float inTemp, float outTemp) {
     display.setFont(u8g2_font_8x13B_mf);
 
     display.sendBuffer();					// transfer internal memory to the display
+}
+
+void SleetClock::setAllWeatherLedsToZero(){
+    analogWrite(ligthningLED, 0);
+    analogWrite(flakesLED, 0);
+    analogWrite(dropsLED, 0);
+    analogWrite(cloudLED, 0);
+    analogWrite(rgbR, 0);
+    analogWrite(rgbG, 0);
+    analogWrite(rgbB, 0);
+}
+void SleetClock::showWeatherOnLeds(Weather weather){
+    //Serial.print((int)weather);
+    //Serial.print('\t');
+
+    if(previousWeather == weather) {
+        //Serial.print("yes");
+        //Serial.print('\t');
+    }
+    else {
+        animationStep = 0;
+        setAllWeatherLedsToZero();
+        //Serial.print("no ");
+        //Serial.print('\t');
+    }
+    //Serial.print(animationStep);
+    //Serial.println('\t');
+    switch (weather)
+    {
+        case CLEAR_DAY:
+            analogWrite(rgbR, 4095);
+            analogWrite(rgbG, 1525);
+            break;
+        case CLEAR_NIGHT:
+            analogWrite(rgbR, 4095);
+            analogWrite(rgbG, 1523);
+            analogWrite(rgbB, 2300);
+            break;
+        case CLOUDY:
+            analogWrite(cloudLED, 500);
+            break;
+        case RAIN:
+            analogWrite(cloudLED, 500);
+            if(animationStep % 4 == 0){
+                analogWrite(dropsLED, 2048);
+            }
+            else{
+                analogWrite(dropsLED, 0);
+            }
+            break;
+        case HEAVY_RAIN:
+            analogWrite(cloudLED, 500);
+            if(animationStep % 2 == 0){
+                analogWrite(dropsLED, 2048);
+                analogWrite(ligthningLED, 0);
+            }
+            else if(animationStep % 3 == 0){
+                analogWrite(dropsLED, 0);
+                analogWrite(ligthningLED, 4096);
+            }
+            else{
+                analogWrite(dropsLED, 0);
+                analogWrite(ligthningLED, 0);
+            }
+            break;
+        case SNOW:
+            analogWrite(cloudLED, 500);
+            if(animationStep % 3 == 0){
+                analogWrite(flakesLED, 300);
+            }
+            else{
+                analogWrite(flakesLED, 0);
+            }
+            break;
+        case SLEET:
+            analogWrite(cloudLED, 500);
+            if(animationStep % 8 == 4){
+                analogWrite(flakesLED, 300);
+                analogWrite(dropsLED, 0);
+            }
+            else if(animationStep % 4 == 0){
+                analogWrite(flakesLED, 0);
+                analogWrite(dropsLED, 2048);
+            }
+            else{
+                analogWrite(flakesLED, 0);
+                analogWrite(dropsLED, 0);
+            }
+
+            break;
+        case WIND:
+            if(animationStep > 10){
+                animationStep = 0;
+            }
+            if(animationStep < 5){
+                analogWrite(cloudLED, 100*(animationStep+1));
+            }
+            else{
+                analogWrite(cloudLED, (10-animationStep+1)*100);
+            }
+            break;
+        case FOG:
+            analogWrite(cloudLED, 500);
+            analogWrite(rgbR, 400);
+            analogWrite(rgbG, 200);
+            break;
+        case PARTLY_CLOUDY_DAY:
+            analogWrite(rgbR, 4095);
+            analogWrite(rgbG, 1525);
+            analogWrite(cloudLED, 200);
+            break;
+        case PARTLY_CLOUDY_NIGHT:
+            analogWrite(rgbR, 4095);
+            analogWrite(rgbG, 1523);
+            analogWrite(rgbB, 2300);
+            analogWrite(cloudLED, 200);
+            break;
+        case UNAVAILABLE:
+            setAllWeatherLedsToZero();
+            break;
+        case OTHER:
+            setAllWeatherLedsToZero();
+            break;
+        case INITIAL:
+            setAllWeatherLedsToZero();
+            break;
+    }
+    
+    previousWeather = weather;
+    animationStep++;
 }
 
 const unsigned char SleetClock::logoVedatori[] = {
