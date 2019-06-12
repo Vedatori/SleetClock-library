@@ -52,6 +52,19 @@ void SleetClock::drawLogo() {
     display.sendBuffer();
 }
 
+void SleetClock::drawTimeTemps(struct tm timeNow, float inTemp, float outTemp) {
+    display.clearBuffer();					// clear the internal memory
+    display.setFont(u8g2_font_profont29_mf);	// choose a suitable font
+
+    char timeString[6];
+    sprintf(timeString, "%02d:%02d", timeNow.tm_hour, timeNow.tm_min);
+    display.drawStr(3, 19, timeString);	// write something to the internal memory
+
+    display.setFont(u8g2_font_8x13B_mf);
+
+    display.sendBuffer();					// transfer internal memory to the display
+}
+
 const unsigned char SleetClock::logoVedatori[] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

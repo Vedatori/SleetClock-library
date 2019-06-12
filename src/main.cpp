@@ -131,10 +131,12 @@ void setup() {
 
     sleetClock.drawLogo();
     delay(1000);  
-    sleetClock.display.clearBuffer();					// clear the internal memory
-    sleetClock.display.setFont(u8g2_font_ncenB08_tr);	// choose a suitable font
-    sleetClock.display.drawStr(0,10,"Hello World!");	// write something to the internal memory
-    sleetClock.display.sendBuffer();					// transfer internal memory to the display
+
+    struct tm timeNow = {};
+    timeNow.tm_hour = 10;
+    timeNow.tm_min = 1;
+    timeNow.tm_sec = 54;
+    sleetClock.drawTimeTemps(timeNow, 26.1, 23.0);
 
     new (&darkSkyApiKey) WiFiManagerParameter("darkSkyKeyId", "Dark Sky API key", "", darkSkyApiKeyLength, "placeholder=\"GUID\"");
     new (&coordinatesLatitude) WiFiManagerParameter("coordinateLatitude", "Coordinate Latitude", "", latitudeLongitudeLength, "placeholder=\"37.8267\"");
@@ -159,10 +161,10 @@ void setup() {
         Serial.println("Connected to wi-fi");
     }
 
-    xTaskCreatePinnedToCore(printInfo, "printInfo", 2048, NULL, 1, NULL, 0);
+    /*xTaskCreatePinnedToCore(printInfo, "printInfo", 2048, NULL, 1, NULL, 0);
     dsParser.begin(apiKey, latitude, longitude);
     configTzTime(tz, ntpServer1, ntpServer2, ntpServer3);
-    dsParser.getData();
+    dsParser.getData();*/
 
 }
 
