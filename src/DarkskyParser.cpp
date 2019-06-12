@@ -1,6 +1,7 @@
 #include "DarkskyParser.h"
 #include "JsonListener.h"
 #include <time.h>
+#include "SleetClock.h"
 
 void DarkskyParser::whitespace(char c) {
 }
@@ -9,6 +10,8 @@ void DarkskyParser::startDocument() {
 }
 
 void DarkskyParser::endDocument() {
+  for (int i = 0; i<DS_NUMBER_OF_HOURLY_DATA; i++)
+    weatherData[i].weather = darkskyWeatherToIcon(weatherData[i].weather, weatherData[i].precipIntensity);
 }
 
 void DarkskyParser::key(String key) {
@@ -197,5 +200,49 @@ void DarkskyParser::setData(String value) {
             break;
         }
       }
+  }
+}
+
+/* mapping from darksky weather to this clock weather */
+/* rain is split into usual rain and heavy rain */
+int DarkskyParser::darkskyWeatherToIcon(int weather, int precipIntensity) {
+  switch (weather) {
+    case 0: /* clear-day */
+      return (int)CLEAR_DAY;
+      break;
+    case 1: /* clear-night */
+      return (int)CLEAR_NIGHT;
+      break;
+    case 2: /* rain */
+      if (precipIntensity < 5) {
+        return (int)RAIN;
+      } else {
+        return (int)HEAVY_RAIN;
+      }
+      break;
+    case 3: /* snow */
+      return (int)SNOW;
+      break;
+    case 4: /* sleet */
+      return (int)SLEET;
+      break;
+    case 5:
+      return (int)WIND;
+      break;
+    case 6:
+      return (int)FOG;
+      break;
+    case 7: /* cloudy */
+      return (int)CLOUDY;
+      break;
+    case 8: /* partly-cloudy-day */
+      return (int)PARTLY_CLOUDY_DAY;
+      break;
+    case 9: /* partly-cloudy-night */
+      return (int)PARTLY_CLOUDY_NIGHT;
+      break;
+    default:
+      return (int)OTHER;
+      break;
   }
 }

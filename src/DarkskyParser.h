@@ -5,7 +5,7 @@
 #include "JsonStreamingParser.h"
 #include "JsonListener.h"
 
-#define DS_NUMBER_OF_HOURLY_DATA 12
+#define DS_NUMBER_OF_HOURLY_DATA 24
 
 typedef struct {
       int weather;
@@ -87,6 +87,7 @@ class DarkskyParser: public JsonListener {
     int getChar();
     void setSubStatus(String key);
     void setData(String value);
+    int darkskyWeatherToIcon(int weather, int precipIntensity);
 };
 
 #endif /* DARKSKY_PARSER_H */

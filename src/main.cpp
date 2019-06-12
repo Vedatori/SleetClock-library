@@ -102,6 +102,17 @@ void setup() {
     configTime(tz, 0, ntpServer1, ntpServer2, ntpServer3);
     dsParser.getData();
     // set printing to dispaly to another rutine
+    for (int i = 0; i< DS_NUMBER_OF_HOURLY_DATA; i++){
+        Serial.print(dsParser.weatherData[i].weather);
+        Serial.print(" ");
+        Serial.print(dsParser.weatherData[i].temperature);
+        Serial.print(" ");
+        Serial.println(dsParser.weatherData[i].precipProbability);
+        for(int j = 0; j < 20;j++){
+            sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[i].weather);
+            delay(100);
+        }
+    }
     xTaskCreatePinnedToCore(printInfo, "printInfo", 2048, NULL, 1, NULL, 0);
 
 }
