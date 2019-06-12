@@ -76,11 +76,21 @@ public:
     void init();
     void analogWrite(uint8_t pcaPin, uint16_t value);   //set PCA9685 connected devices power PWM in range 0(off)-4095(on)
     void allOff();  //turn off all external devices
+    void updateState();
     void showOnDisplay();
     void drawLogo();
     void drawTimeTemps(struct tm timeNow, float inTemp, float outTemp);
+    void drawForecast(struct tm timeNow, int8_t hoursOffset, float outTemp);
     void showWeatherOnLeds(Weather weather);
     void setAllWeatherLedsToZero();
+
+    struct stateVector {
+        float inTemp = 0.0;     //[°C]
+        float outTemp = 0.0;    //[°C]
+        int32_t cursor = 0;
+        uint32_t cursorChangeTime = 0;   //[ms]
+        int16_t illuminance = 0;   //12-bit reading
+    } state;
 };
 
 #endif  //_SLEET_CLOCK_H

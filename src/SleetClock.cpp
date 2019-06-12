@@ -25,6 +25,8 @@ void SleetClock::init() {
 
     dallasTemp = DallasTemperature(&oneWireDS);
     dallasTemp.begin();
+    dallasTemp.requestTemperaturesByIndex(0);
+    state.inTemp = dallasTemp.getTempCByIndex(0);
 }
 
 void SleetClock::analogWrite(uint8_t pcaPin, uint16_t value) {
@@ -42,6 +44,20 @@ void SleetClock::allOff() {
     }
 }
 
+void SleetClock::updateState() {
+    dallasTemp.requestTemperaturesByIndex(0);
+    float readTemp = dallasTemp.getTempCByIndex(0);
+    if(readTemp > -55 && readTemp < 125)
+        state.inTemp = 0.99*state.inTemp + 0.01*readTemp;    //IIR filter
+
+    int32_t prevCursor = state.cursor;
+    state.cursor += encoder.getDiff() + touchBar.getDiff();
+    if(state.cursor != prevCursor)
+        state.cursorChangeTime = millis();
+
+    state.illuminance = analogRead(photoresistor);
+}
+
 void SleetClock::showOnDisplay() {
     
 }
@@ -53,16 +69,60 @@ void SleetClock::drawLogo() {
 }
 
 void SleetClock::drawTimeTemps(struct tm timeNow, float inTemp, float outTemp) {
-    display.clearBuffer();					// clear the internal memory
-    display.setFont(u8g2_font_profont29_mf);	// choose a suitable font
+    display.clearBuffer();
+    char outString[8];
 
-    char timeString[6];
-    sprintf(timeString, "%02d:%02d", timeNow.tm_hour, timeNow.tm_min);
-    display.drawStr(3, 19, timeString);	// write something to the internal memory
+    display.setFont(u8g2_font_profont29_mf);
+    sprintf(outString, "%02d:%02d", timeNow.tm_hour, timeNow.tm_min);
+    display.drawStr(3, 19, outString);
 
-    display.setFont(u8g2_font_8x13B_mf);
+    display.setFont(u8g2_font_5x8_mn);
+    sprintf(outString, "%02d", timeNow.tm_sec);
+    display.drawStr(36, 30, outString);
+    display.drawEllipse(40, 27, 7, 6, U8G2_DRAW_ALL);
 
-    display.sendBuffer();					// transfer internal memory to the display
+    display.setFont(u8g2_font_tenthinnerguys_tf );
+    display.drawStr(11, 35, "In");
+    display.drawStr(56, 35, "Out");
+
+    sprintf(outString, "%.1f°C", inTemp);
+    display.drawUTF8(0, 48, outString);
+
+    sprintf(outString, "%.1f°C", outTemp);
+    display.drawUTF8(46, 48, outString);
+
+    display.sendBuffer();
+}
+
+void SleetClock::drawForecast(struct tm timeNow, int8_t hoursOffset, float outTemp) {
+    timeNow.tm_hour += hoursOffset;
+    if(timeNow.tm_hour > 23)
+        timeNow.tm_hour -= 24;
+    else if(timeNow.tm_hour < 0)
+        timeNow.tm_hour += 24;
+
+    display.clearBuffer();
+    char outString[8];
+
+    display.setFont(u8g2_font_profont29_mf);
+    sprintf(outString, "%02d:%02d", timeNow.tm_hour, timeNow.tm_min);
+    display.drawStr(3, 19, outString);
+
+    display.setFont(u8g2_font_tenthinnerguys_tf );
+    sprintf(outString, "In %d", hoursOffset);
+    display.drawStr(6, 35, outString);
+    display.drawStr(56, 35, "Out");
+
+    if(hoursOffset == 1 || hoursOffset == -1)
+        display.drawStr(0, 48, "hour");
+    else
+        display.drawStr(0, 48, "hours");
+    
+
+    sprintf(outString, "%.1f°C", outTemp);
+    display.drawUTF8(46, 48, outString);
+
+    display.sendBuffer();
 }
 
 void SleetClock::setAllWeatherLedsToZero(){

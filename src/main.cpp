@@ -45,36 +45,41 @@ void saveParamCallback(){
 }
 
 void printInfo(void *arg) {
-    int currentWeather[12], lastWeather[12];
+    /*int currentWeather[12], lastWeather[12];
     int currentPrecipProbability[12], lastPrecipProbability[12];
-    struct tm timeInfo;
     time_t lastUpdate = 0;
     int lastHour = -1;
-    float lastTemperature = 0, lastHumidity = 0;
-    char s[9];
-    sleetClock.display.clearBuffer();
+    float lastTemperature = 0, lastHumidity = 0;*/
+    struct tm timeInfo;
 
     while (1) {
-        time_t currentTime = time(NULL);
-        sleetClock.display.clearBuffer();
+        //Get sensors data
+        sleetClock.updateState();
 
-        sleetClock.display.sendBuffer();
-        delay(100);
+        //time_t currentTime = time(NULL);
+        getLocalTime(&timeInfo);
+        int32_t currentCursor = sleetClock.state.cursor;
+        if(currentCursor < 0)
+            currentCursor = 0;
+        else if(currentCursor >= DS_NUMBER_OF_HOURLY_DATA)
+            currentCursor = DS_NUMBER_OF_HOURLY_DATA - 1;
+        if(currentCursor == 0)
+            sleetClock.drawTimeTemps(timeInfo, sleetClock.state.inTemp, dsParser.weatherData[currentCursor].temperature);
+        else {
+            sleetClock.drawForecast(timeInfo, currentCursor, dsParser.weatherData[currentCursor].temperature);
+            if((millis() - sleetClock.state.cursorChangeTime) > 5000) {
+                sleetClock.state.cursor = 0;
+            }
+        }
+        sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[currentCursor].weather);
+        delay(200);
     }
 }
 
 void setup() {
     Serial.begin(115200);
     sleetClock.init();
-
     sleetClock.drawLogo();
-    delay(1000);  
-
-    struct tm timeNow = {};
-    timeNow.tm_hour = 10;
-    timeNow.tm_min = 1;
-    timeNow.tm_sec = 54;
-    sleetClock.drawTimeTemps(timeNow, 26.1, 23.0);
 
     new (&darkSkyApiKey) WiFiManagerParameter("darkSkyKeyId", "Dark Sky API key", "", darkSkyApiKeyLength, "placeholder=\"GUID\"");
     new (&coordinatesLatitude) WiFiManagerParameter("coordinateLatitude", "Coordinate Latitude", "", latitudeLongitudeLength, "placeholder=\"37.8267\"");
@@ -100,9 +105,9 @@ void setup() {
     }
     dsParser.begin(apiKey.c_str(), latitude.c_str(), longitude.c_str());
     configTime(tz, 0, ntpServer1, ntpServer2, ntpServer3);
-    dsParser.getData();
+
     // set printing to dispaly to another rutine
-    for (int i = 0; i< DS_NUMBER_OF_HOURLY_DATA; i++){
+    /*for (int i = 0; i< DS_NUMBER_OF_HOURLY_DATA; i++){
         Serial.print(dsParser.weatherData[i].weather);
         Serial.print(" ");
         Serial.print(dsParser.weatherData[i].temperature);
@@ -112,22 +117,18 @@ void setup() {
             sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[i].weather);
             delay(100);
         }
-    }
+    }*/
     xTaskCreatePinnedToCore(printInfo, "printInfo", 2048, NULL, 1, NULL, 0);
 
 }
 
 void loop() {
-  
-    Serial.print("Encoder: ");
-    Serial.print(sleetClock.encoder.getCount());
-    sleetClock.dallasTemp.requestTemperaturesByIndex(0);
-    Serial.print(" Temperature: ");
-    Serial.print(sleetClock.dallasTemp.getTempCByIndex(0));
-    Serial.print(" TouchCount: ");
-    Serial.print(sleetClock.touchBar.getCount());
+
+    Serial.print("Cursor: ");
+    Serial.print(sleetClock.state.cursor);
 
     Serial.println();
+    dsParser.getData();
     
-    delay(100);
+    delay(10000);
 }
