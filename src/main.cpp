@@ -58,20 +58,21 @@ void printInfo(void *arg) {
 
         //time_t currentTime = time(NULL);
         getLocalTime(&timeInfo);
-        int32_t currentCursor = sleetClock.state.cursor;
-        if(currentCursor < 0)
-            currentCursor = 0;
-        else if(currentCursor >= DS_NUMBER_OF_HOURLY_DATA)
-            currentCursor = DS_NUMBER_OF_HOURLY_DATA - 1;
-        if(currentCursor == 0)
-            sleetClock.drawTimeTemps(timeInfo, sleetClock.state.inTemp, dsParser.weatherData[currentCursor].temperature);
+        if(sleetClock.state.cursor < 0) {
+            sleetClock.state.cursor = 0;
+        }
+        else if(sleetClock.state.cursor >= DS_NUMBER_OF_HOURLY_DATA) {
+            sleetClock.state.cursor = DS_NUMBER_OF_HOURLY_DATA - 1;
+        }
+        if(sleetClock.state.cursor == 0)
+            sleetClock.drawTimeTemps(timeInfo, sleetClock.state.inTemp, dsParser.weatherData[sleetClock.state.cursor].temperature);
         else {
-            sleetClock.drawForecast(timeInfo, currentCursor, dsParser.weatherData[currentCursor].temperature);
+            sleetClock.drawForecast(timeInfo, sleetClock.state.cursor, dsParser.weatherData[sleetClock.state.cursor].temperature);
             if((millis() - sleetClock.state.cursorChangeTime) > 5000) {
                 sleetClock.state.cursor = 0;
             }
         }
-        sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[currentCursor].weather);
+        sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[sleetClock.state.cursor].weather);
         delay(200);
     }
 }
