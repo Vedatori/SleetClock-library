@@ -45,11 +45,6 @@ void saveParamCallback(){
 }
 
 void printInfo(void *arg) {
-    /*int currentWeather[12], lastWeather[12];
-    int currentPrecipProbability[12], lastPrecipProbability[12];
-    time_t lastUpdate = 0;
-    int lastHour = -1;
-    float lastTemperature = 0, lastHumidity = 0;*/
     struct tm timeInfo;
 
     while (1) {
@@ -81,6 +76,8 @@ void setup() {
     Serial.begin(115200);
     sleetClock.init();
     sleetClock.drawLogo();
+
+    //wm.resetSettings();
 
     new (&darkSkyApiKey) WiFiManagerParameter("darkSkyKeyId", "Dark Sky API key", "", darkSkyApiKeyLength, "placeholder=\"GUID\"");
     new (&coordinatesLatitude) WiFiManagerParameter("coordinateLatitude", "Coordinate Latitude", "", latitudeLongitudeLength, "placeholder=\"37.8267\"");
