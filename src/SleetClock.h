@@ -28,8 +28,8 @@ enum Weather{
 
 class SleetClock {
     Adafruit_PWMServoDriver pwm;
-    Weather previousWeather;
-    unsigned animationStep = 0;
+    Weather previousWeather = INITIAL;
+    unsigned animationStep;
 public:
     static const uint8_t ligthningLED = 0;
     static const uint8_t flakesLED = 1;

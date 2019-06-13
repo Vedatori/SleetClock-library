@@ -15,7 +15,7 @@ void SleetClock::init() {
     pwm.setPWMFreq(1000);
     Wire.setClock(400000);
     
-    this->allOff();
+    allOff();
 
     display.begin();
     
@@ -27,6 +27,8 @@ void SleetClock::init() {
     dallasTemp.begin();
     dallasTemp.requestTemperaturesByIndex(0);
     state.inTemp = dallasTemp.getTempCByIndex(0);
+
+    previousWeather = INITIAL;
 }
 
 void SleetClock::analogWrite(uint8_t pcaPin, uint16_t value) {
@@ -135,21 +137,21 @@ void SleetClock::setAllWeatherLedsToZero(){
     analogWrite(rgbB, 0);
 }
 void SleetClock::showWeatherOnLeds(Weather weather){
-    //Serial.print((int)weather);
-    //Serial.print('\t');
+    Serial.print((int)weather);
+    Serial.print('\t');
 
     if(previousWeather == weather) {
-        //Serial.print("yes");
-        //Serial.print('\t');
+        Serial.print("yes");
+        Serial.print('\t');
     }
     else {
         animationStep = 0;
         setAllWeatherLedsToZero();
-        //Serial.print("no ");
-        //Serial.print('\t');
+        Serial.print("no ");
+        Serial.print('\t');
     }
-    //Serial.print(animationStep);
-    //Serial.println('\t');
+    Serial.print(animationStep);
+    Serial.println('\t');
     switch (weather)
     {
         case CLEAR_DAY:
@@ -223,6 +225,9 @@ void SleetClock::showWeatherOnLeds(Weather weather){
             else{
                 analogWrite(cloudLED, (10-animationStep+1)*100);
             }
+            analogWrite(rgbR, 0);
+            analogWrite(rgbG, 0);
+            analogWrite(rgbB, 0);
             break;
         case FOG:
             analogWrite(cloudLED, 500);
