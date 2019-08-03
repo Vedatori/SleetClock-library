@@ -34,10 +34,8 @@ void SleetClock::init() {
 void SleetClock::analogWrite(uint8_t pcaPin, uint16_t value) {
     if(value > 4095)
         value = 4095;
-    if(pcaPin == buzzer)
-        pwm.setPWM(pcaPin, 0, 4095 - value);
-    else
-        pwm.setPWM(pcaPin, 0, value);
+    
+    pwm.setPWM(pcaPin, 0, value);
 }
 
 void SleetClock::allOff() {
