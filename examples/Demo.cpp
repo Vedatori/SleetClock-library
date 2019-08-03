@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <WiFiManager.h>
 #include "SleetClock.h"
-
 #include "DarkskyParser.h"
 
 
