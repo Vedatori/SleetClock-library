@@ -39,7 +39,7 @@
         },
         {
           "name": "IndieBlocks",
-          "version": "https://github.com/MarPta/IndieBlocks.git"
+          "version": "https://github.com/MarPta/IndieBlocks.git#1.0.0"
         }
     ],
     "version": "0.9.0",
