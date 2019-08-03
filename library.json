@@ -36,7 +36,7 @@
         {
           "name": "IndieBlocks",
           "version": "https://github.com/MarPta/IndieBlocks.git#1.0.0"
-        }
+        },
         {
           "name": "JsonStreamingParser",
           "version": "https://github.com/squix78/json-streaming-parser.git#1.0.5"
