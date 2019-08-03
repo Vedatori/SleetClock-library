@@ -1,7 +1,7 @@
 #include "SleetClock.h"
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
-#include <ESP32_encoder.h>
+#include <ESP32/ESP32_encoder.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <time.h>
