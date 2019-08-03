@@ -4,8 +4,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
-#include <ESP32/ESP32_encoder.h>
-#include <ESP32/ESP32_touchBar.h>
+#include <ESP32_encoder.h>
+#include <ESP32_touchBar.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <U8g2lib.h>
