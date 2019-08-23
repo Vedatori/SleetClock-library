@@ -21,30 +21,7 @@
     ],
     "dependencies":
     [
-        {
-          "name": "Adafruit PWM Servo Driver Library",
-          "version": "https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library.git#1.0.4"
-        },
-        {
-            "name": "U8g2_Arduino",
-            "version": "https://github.com/olikraus/U8g2_Arduino#2.26.14"
-        },
-        {
-            "name": "DallasTemperature",
-            "version": "https://github.com/milesburton/Arduino-Temperature-Control-Library.git#3.8.0"
-        },
-        {
-          "name": "IndieBlocks",
-          "version": "https://github.com/MarPta/IndieBlocks.git#1.0.0"
-        },
-        {
-          "name": "JsonStreamingParser",
-          "version": "https://github.com/squix78/json-streaming-parser.git#1.0.5"
-        },
-        {
-          "name": "IndieBlocks",
-          "version": "https://github.com/MarPta/IndieBlocks.git#master"
-        }
+
     ],
     "version": "0.9.0",
     "frameworks": "arduino",

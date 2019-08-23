@@ -3,7 +3,6 @@
 #include "SleetClock.h"
 #include "DarkskyParser.h"
 
-
 SleetClock sleetClock;
 
 DarkskyParser dsParser;
@@ -50,7 +49,7 @@ void printInfo(void *arg) {
         //Get sensors data
         sleetClock.updateState();
 
-        //time_t currentTime = time(NULL);
+        //time_t currentTime = time(NULL);{}
         getLocalTime(&timeInfo);
         if(sleetClock.state.cursor < 0) {
             sleetClock.state.cursor = 0;
@@ -91,7 +90,7 @@ void setup() {
     wm.setMenu(menu,4);
     
     bool res;
-    res = wm.autoConnect("Vedatori");
+    res = wm.autoConnect("SleetClock");
 
     if(!res) {
         Serial.println("Failed to connect or hit timeout");
