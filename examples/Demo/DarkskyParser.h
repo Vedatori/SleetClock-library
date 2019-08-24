@@ -1,9 +1,10 @@
 #ifndef DARKSKY_PARSER_H
 #define DARKSKY_PARSER_H
 
-#include "WiFiManager-development/WiFiManager.h"
+#include "WiFiManager.h"
 #include "json-streaming-parser/JsonStreamingParser.h"
 #include "json-streaming-parser/JsonListener.h"
+#include <WiFiClientSecure.h>
 
 #define DS_NUMBER_OF_HOURLY_DATA 24
 
