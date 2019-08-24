@@ -258,6 +258,22 @@ void SleetClock::showWeatherOnLeds(Weather weather){
     animationStep++;
 }
 
+void SleetClock::setBuzzerOff(){
+    setBuzzerLevel(0);
+}
+
+void SleetClock::setBuzzerOn(){
+    setBuzzerLevel(1500);
+}
+
+void SleetClock::setBuzzerLevel(unsigned level){
+    if(level > 4095)
+        level = 4095;
+    
+    analogWrite(buzzer, level);
+}
+
+
 const unsigned char SleetClock::logoVedatori[] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
