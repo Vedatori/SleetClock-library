@@ -1,7 +1,7 @@
 #ifndef DARKSKY_PARSER_H
 #define DARKSKY_PARSER_H
 
-#include <WiFiClientSecure.h>
+#include "WiFiManager-development/WiFiManager.h"
 #include "json-streaming-parser/JsonStreamingParser.h"
 #include "json-streaming-parser/JsonListener.h"
 
