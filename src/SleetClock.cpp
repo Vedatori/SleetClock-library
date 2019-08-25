@@ -282,6 +282,20 @@ void SleetClock::setBlueLevel(unsigned level){
     analogWrite(rgbB, level);
 }
 
+void SleetClock::setLigthningLEDLevel(unsigned level){
+    analogWrite(ligthningLED, level);
+}
+void SleetClock::setFlakesLEDLevel(unsigned level){
+    analogWrite(flakesLED, level);
+}
+
+void SleetClock::setDropsLEDLevel(unsigned level){
+    analogWrite(dropsLED, level);
+}
+
+void SleetClock::setCloudLEDLevel(unsigned level){
+    analogWrite(cloudLED, level);
+}
 
 const unsigned char SleetClock::logoVedatori[] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

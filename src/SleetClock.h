@@ -17,19 +17,6 @@
 #include <Wire.h>
 #endif
 
-#define PIN_encoderSwitch 17
-#define PIN_tempDHT 16
-#define PIN_encoderA 25
-#define PIN_encoderB 26
-#define PIN_potentiometer 34
-#define PIN_photoresistor 35
-#define PIN_button0 36
-#define PIN_button1 39
-#define PIN_displayCLK 23
-#define PIN_displayDIN 19
-#define PIN_displayDC 18
-#define PIN_displayCE 5
-#define PIN_displayRST 32
 
 /* weather definition */
 enum Weather{
@@ -103,6 +90,10 @@ public:
     void setRedLevel(unsigned level);
     void setGreenLevel(unsigned level);
     void setBlueLevel(unsigned level);
+    void setLigthningLEDLevel(unsigned level);
+    void setFlakesLEDLevel(unsigned level);
+    void setDropsLEDLevel(unsigned level);
+    void setCloudLEDLevel(unsigned level);
     
     struct stateVector {
         float inTemp = 0.0;     //[°C]
