@@ -50,6 +50,9 @@ void loop() {
     else{
         sleetClock.setBuzzerOff();
     }
+    if(currentMillis > timerMillis + timerLast){
+        ESP.restart();
+    }
     unsigned remainingTime = (timerMillis - currentMillis)/1000;
     Serial.println(remainingTime);
     delay(100);

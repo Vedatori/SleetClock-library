@@ -17,12 +17,10 @@ void SleetClock::init() {
     
     allOff();
 
-    
     display.begin();
     
-    encoder.risingSensitive = false;
+    encoder.risingSensitive = true;
     encoder.init();
-    pinMode(encoderSwitch, INPUT);
     touchBar.init();    // must be after display.begin
 
     pinMode(encoderSwitch, INPUT);
