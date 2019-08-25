@@ -99,6 +99,10 @@ public:
     void setAllWeatherLedsToZero();
     void setBuzzerOn();
     void setBuzzerOff();
+    void setBuzzerLevel(unsigned level);
+    void setRedLevel(unsigned level);
+    void setGreenLevel(unsigned level);
+    void setBlueLevel(unsigned level);
     
     struct stateVector {
         float inTemp = 0.0;     //[°C]

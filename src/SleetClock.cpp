@@ -266,11 +266,20 @@ void SleetClock::setBuzzerOn(){
     setBuzzerLevel(1500);
 }
 
-void SleetClock::setBuzzerLevel(unsigned level){
-    if(level > 4095)
-        level = 4095;
-    
+void SleetClock::setBuzzerLevel(unsigned level){    
     analogWrite(buzzer, level);
+}
+
+void SleetClock::setRedLevel(unsigned level){
+    analogWrite(rgbR, level);
+}
+
+void SleetClock::setGreenLevel(unsigned level){
+    analogWrite(rgbG, level);
+}
+
+void SleetClock::setBlueLevel(unsigned level){
+    analogWrite(rgbB, level);
 }
 
 
