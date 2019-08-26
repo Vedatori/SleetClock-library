@@ -70,7 +70,7 @@ void SleetClock::drawLogo() {
 
 void SleetClock::drawTimeTemps(struct tm timeNow, float inTemp, float outTemp) {
     display.clearBuffer();
-    char outString[8];
+    char outString[10];
 
     display.setFont(u8g2_font_profont29_mf);
     sprintf(outString, "%02d:%02d", timeNow.tm_hour, timeNow.tm_min);
