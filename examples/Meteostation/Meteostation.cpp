@@ -4,7 +4,6 @@
 #include "DarkskyParser.h"
 
 SleetClock sleetClock;
-
 DarkskyParser dsParser;
 
 String apiKey = String("646f7e8e4fb6b4a169d193a8cc67ee2f");
@@ -48,7 +47,7 @@ void printInfo(void *arg) {
     while (1) {
         //Get sensors data
         sleetClock.updateState();
-
+        
         //time_t currentTime = time(NULL);{}
         getLocalTime(&timeInfo);
         if(sleetClock.state.cursor < 0) {
@@ -65,6 +64,7 @@ void printInfo(void *arg) {
                 sleetClock.state.cursor = 0;
             }
         }
+        
         sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[sleetClock.state.cursor].weather);
         delay(200);
     }
@@ -115,16 +115,9 @@ void setup() {
         }
     }*/
     xTaskCreatePinnedToCore(printInfo, "printInfo", 2048, NULL, 1, NULL, 0);
-
 }
 
 void loop() {
-
-    Serial.print("Cursor: ");
-    Serial.print(sleetClock.state.cursor);
-
-    Serial.println();
     dsParser.getData();
-    
-    delay(10000);
+    delay(60000);
 }

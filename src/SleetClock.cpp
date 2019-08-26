@@ -55,7 +55,7 @@ void SleetClock::updateState() {
         state.inTemp = 0.99*state.inTemp + 0.01*readTemp;    //IIR filter
 
     int32_t prevCursor = state.cursor;
-    state.cursor += encoder.getDiff() + touchBar.getDiff();
+    state.cursor += encoder.getDiff()/2 + touchBar.getDiff();
     if(state.cursor != prevCursor)
         state.cursorChangeTime = millis();
 
@@ -139,21 +139,21 @@ void SleetClock::setAllWeatherLedsToZero(){
     analogWrite(rgbB, 0);
 }
 void SleetClock::showWeatherOnLeds(Weather weather){
-    Serial.print((int)weather);
-    Serial.print('\t');
+    //Serial.print((int)weather);
+    //Serial.print('\t');
 
     if(previousWeather == weather) {
-        Serial.print("yes");
-        Serial.print('\t');
+        //Serial.print("yes");
+        //Serial.print('\t');
     }
     else {
         animationStep = 0;
         setAllWeatherLedsToZero();
-        Serial.print("no ");
-        Serial.print('\t');
+        //Serial.print("no ");
+        //Serial.print('\t');
     }
-    Serial.print(animationStep);
-    Serial.println('\t');
+    //Serial.print(animationStep);
+    //Serial.println('\t');
     switch (weather)
     {
         case CLEAR_DAY:
