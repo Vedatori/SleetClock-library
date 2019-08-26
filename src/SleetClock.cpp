@@ -19,9 +19,13 @@ void SleetClock::init() {
 
     display.begin();
     
-    encoder.risingSensitive = false;
+    encoder.risingSensitive = true;
     encoder.init();
     touchBar.init();    // must be after display.begin
+
+    pinMode(encoderSwitch, INPUT);
+    pinMode(button0, INPUT);
+    pinMode(button1, INPUT);
 
     dallasTemp = DallasTemperature(&oneWireDS);
     dallasTemp.begin();
