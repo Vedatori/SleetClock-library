@@ -67,10 +67,14 @@ void SleetClock::showOnDisplay() {
     
 }
 
-void SleetClock::drawLogo() {
-    display.clearBuffer();
-    display.drawXBM(0, 0, displayWidth, displayHeight, logoVedatori);
+void SleetClock::drawBitmap(const unsigned char bitmap) {
+    display.clearBuffer(); 
+    display.drawXBM(0, 0, displayWidth, displayHeight, bitmap);
     display.sendBuffer();
+}
+
+void SleetClock::drawLogo() {
+    drawBitmap(logoVedatori);
 }
 
 void SleetClock::drawTimeTemps(struct tm timeNow, float inTemp, float outTemp) {
