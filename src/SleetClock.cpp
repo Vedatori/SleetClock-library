@@ -67,7 +67,7 @@ void SleetClock::showOnDisplay() {
     
 }
 
-void SleetClock::drawBitmap(const unsigned char bitmap) {
+void SleetClock::drawBitmap(const unsigned char* bitmap) {
     display.clearBuffer(); 
     display.drawXBM(0, 0, displayWidth, displayHeight, bitmap);
     display.sendBuffer();

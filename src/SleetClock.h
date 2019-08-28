@@ -80,7 +80,7 @@ public:
     void updateState();
     void showOnDisplay();
     void drawLogo();
-    void drawBitmap(const unsigned char bitmap);
+    void drawBitmap(const unsigned char* bitmap);
     void drawTimeTemps(struct tm timeNow, float inTemp, float outTemp);
     void drawForecast(struct tm timeNow, int8_t hoursOffset, float outTemp);
     void showWeatherOnLeds(Weather weather);
