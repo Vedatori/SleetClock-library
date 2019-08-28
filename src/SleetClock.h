@@ -100,7 +100,8 @@ public:
         float outTemp = 0.0;    //[°C]
         int32_t cursor = 0;
         uint32_t cursorChangeTime = 0;   //[ms]
-        int16_t illuminance = 0;   //12-bit reading
+        float illuminance = 0;   //12-bit reading
+        int16_t potentiometer = 0;  //12-bit reading
     } state;
 };
 

@@ -59,7 +59,8 @@ void SleetClock::updateState() {
     if(state.cursor != prevCursor)
         state.cursorChangeTime = millis();
 
-    state.illuminance = analogRead(photoresistor);
+    state.illuminance = /*0.9*state.illuminance + 0.1*/analogRead(photoresistor);
+    state.potentiometer = analogRead(potentiometer);
 }
 
 void SleetClock::showOnDisplay() {
@@ -142,15 +143,10 @@ void SleetClock::showWeatherOnLeds(Weather weather){
     //Serial.print((int)weather);
     //Serial.print('\t');
 
-    if(previousWeather == weather) {
-        //Serial.print("yes");
-        //Serial.print('\t');
-    }
-    else {
+    if(previousWeather != weather) {
+        previousWeather = weather;
         animationStep = 0;
         setAllWeatherLedsToZero();
-        //Serial.print("no ");
-        //Serial.print('\t');
     }
     //Serial.print(animationStep);
     //Serial.println('\t');
@@ -257,8 +253,6 @@ void SleetClock::showWeatherOnLeds(Weather weather){
             setAllWeatherLedsToZero();
             break;
     }
-    
-    previousWeather = weather;
     animationStep++;
 }
 

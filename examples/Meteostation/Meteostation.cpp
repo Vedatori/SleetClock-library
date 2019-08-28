@@ -66,7 +66,13 @@ void printInfo(void *arg) {
         }
         
         sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[sleetClock.state.cursor].weather);
-        delay(200);
+        int16_t displayBrightness = sleetClock.state.potentiometer - sleetClock.state.illuminance;
+        if(displayBrightness < 0)
+            displayBrightness = 0;
+        else if(displayBrightness > 4095 )
+            displayBrightness = 4095;
+        sleetClock.analogWrite(sleetClock.displayBacklight, displayBrightness);
+        delay(100);
     }
 }
 
@@ -114,7 +120,7 @@ void setup() {
             delay(100);
         }
     }*/
-    xTaskCreatePinnedToCore(printInfo, "printInfo", 2048, NULL, 1, NULL, 0);
+    xTaskCreate(printInfo, "printInfo", 2048, NULL, 1, NULL);
 }
 
 void loop() {
