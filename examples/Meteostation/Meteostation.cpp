@@ -44,7 +44,14 @@ void saveParamCallback(){
 void printInfo(void *arg) {
     struct tm timeInfo;
 
+    TickType_t xLastWakeTime;
+    const TickType_t xPeriod = 100 / portTICK_PERIOD_MS;
+    xLastWakeTime = xTaskGetTickCount ();
+
     while (1) {
+        //Wait for the next cycle.
+        vTaskDelayUntil( &xLastWakeTime, xPeriod );
+
         //Get sensors data
         sleetClock.updateState();
         
@@ -72,7 +79,15 @@ void printInfo(void *arg) {
         else if(displayBrightness > 4095 )
             displayBrightness = 4095;
         sleetClock.analogWrite(sleetClock.displayBacklight, displayBrightness);
-        delay(100);
+
+        static int resetCounter = 0;
+        if(digitalRead(sleetClock.button0)) {
+            ++resetCounter;
+            if(resetCounter > 50) {
+                wm.resetSettings();
+                ESP.restart();
+            }
+        }
     }
 }
 
@@ -81,11 +96,9 @@ void setup() {
     sleetClock.init();
     sleetClock.drawLogo();
 
-    //wm.resetSettings();
-
     new (&darkSkyApiKey) WiFiManagerParameter("darkSkyKeyId", "Dark Sky API key", "", darkSkyApiKeyLength, "placeholder=\"GUID\"");
-    new (&coordinatesLatitude) WiFiManagerParameter("coordinateLatitude", "Coordinate Latitude", "", latitudeLongitudeLength, "placeholder=\"37.8267\"");
-    new (&coordinatesLongtitude) WiFiManagerParameter("coordinateLongtitude", "Coordinate Longtitude", "", latitudeLongitudeLength, "placeholder=\"-122.4233\"");
+    new (&coordinatesLatitude) WiFiManagerParameter("coordinateLatitude", "Coordinate Latitude", "", latitudeLongitudeLength, "placeholder=\"49.195084\"");
+    new (&coordinatesLongtitude) WiFiManagerParameter("coordinateLongtitude", "Coordinate Longtitude", "", latitudeLongitudeLength, "placeholder=\"16.608140\"");
     
     wm.addParameter(&darkSkyApiKey);
     wm.addParameter(&coordinatesLatitude);
@@ -107,23 +120,10 @@ void setup() {
     }
     dsParser.begin(apiKey.c_str(), latitude.c_str(), longitude.c_str());
     configTime(tz, 0, ntpServer1, ntpServer2, ntpServer3);
-
-    // set printing to dispaly to another rutine
-    /*for (int i = 0; i< DS_NUMBER_OF_HOURLY_DATA; i++){
-        Serial.print(dsParser.weatherData[i].weather);
-        Serial.print(" ");
-        Serial.print(dsParser.weatherData[i].temperature);
-        Serial.print(" ");
-        Serial.println(dsParser.weatherData[i].precipProbability);
-        for(int j = 0; j < 20;j++){
-            sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[i].weather);
-            delay(100);
-        }
-    }*/
     xTaskCreate(printInfo, "printInfo", 2048, NULL, 1, NULL);
 }
 
 void loop() {
     dsParser.getData();
-    delay(60000);
+    delay(300000);
 }
