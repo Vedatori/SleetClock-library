@@ -67,11 +67,12 @@ public:
     static const uint8_t displayHeight = 84; 
 
     static const unsigned char logoVedatori[];   // Obtained using GIMP2 -> Export as .xbm with default settings
+    static float tempExchange;
 
     ESP32_encoder encoder = ESP32_encoder(encoderA, encoderB);
     ESP32_touchBar touchBar = ESP32_touchBar();
     OneWire oneWireDS = OneWire(tempDHT);
-    DallasTemperature dallasTemp;
+    static DallasTemperature dallasTemp;
     U8G2_PCD8544_84X48_F_4W_SW_SPI display = U8G2_PCD8544_84X48_F_4W_SW_SPI(U8G2_R0, displayCLK, displayDIN, displayCE, displayDC, displayRST);  // Nokia 5110 Display
     SleetClock();
     void init();
@@ -79,7 +80,7 @@ public:
     void allOff();  //turn off all external devices
     void updateState();
     void showOnDisplay();
-    void drawLogo();
+    void drawConnecting(const char * ssid);
     void drawBitmap(const unsigned char* bitmap);
     void drawTimeTemps(struct tm timeNow, float inTemp, float outTemp);
     void drawForecast(struct tm timeNow, int8_t hoursOffset, float outTemp);
@@ -95,6 +96,7 @@ public:
     void setFlakesLEDLevel(unsigned level);
     void setDropsLEDLevel(unsigned level);
     void setCloudLEDLevel(unsigned level);
+    static void updateTemp(void * args);
     
     struct stateVector {
         float inTemp = 0.0;     //[°C]

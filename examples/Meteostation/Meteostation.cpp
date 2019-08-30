@@ -2,13 +2,16 @@
 #include <WiFiManager.h>
 #include "SleetClock.h"
 #include "DarkskyParser.h"
+#include <Preferences.h>
 
 SleetClock sleetClock;
 DarkskyParser dsParser;
+Preferences preferences;
 
-String apiKey = String("646f7e8e4fb6b4a169d193a8cc67ee2f");
-String latitude = String("49.2002");
-String longitude = String("16.6078");
+const char * deviceName = "SleetClock";
+String apiKey;
+String latitude;
+String longitude;
 const int darkSkyApiKeyLength = 32;
 const int latitudeLongitudeLength = 9;
 
@@ -31,13 +34,16 @@ String getParam(String name){
     return value;
 }
 
-void saveParamCallback(){
+void saveParamCallback() {
     Serial.println("[CALLBACK] saveParamCallback fired");
     apiKey = getParam("darkSkyKeyId");
+    preferences.putString("apiKey", apiKey);
     Serial.println("PARAM darkSkyApiKey = " + apiKey);
     latitude = getParam("coordinateLatitude");
+    preferences.putString("latitude", latitude);
     Serial.println("PARAM coordinatesLatitude = " + latitude);
     longitude = getParam("coordinateLongtitude");
+    preferences.putString("longitude", longitude);
     Serial.println("PARAM coordinatesLongtitude = " + longitude);
 }
 
@@ -48,10 +54,7 @@ void printInfo(void *arg) {
     const TickType_t xPeriod = 100 / portTICK_PERIOD_MS;
     xLastWakeTime = xTaskGetTickCount ();
 
-    while (1) {
-        //Wait for the next cycle.
-        vTaskDelayUntil( &xLastWakeTime, xPeriod );
-
+    for(;;) {
         //Get sensors data
         sleetClock.updateState();
         
@@ -63,23 +66,17 @@ void printInfo(void *arg) {
         else if(sleetClock.state.cursor >= DS_NUMBER_OF_HOURLY_DATA) {
             sleetClock.state.cursor = DS_NUMBER_OF_HOURLY_DATA - 1;
         }
-        if(sleetClock.state.cursor == 0)
+        if(sleetClock.state.cursor == 0) {
             sleetClock.drawTimeTemps(timeInfo, sleetClock.state.inTemp, dsParser.weatherData[sleetClock.state.cursor].temperature);
+        }
         else {
             sleetClock.drawForecast(timeInfo, sleetClock.state.cursor, dsParser.weatherData[sleetClock.state.cursor].temperature);
             if((millis() - sleetClock.state.cursorChangeTime) > 5000) {
                 sleetClock.state.cursor = 0;
             }
         }
-        
         sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[sleetClock.state.cursor].weather);
-        int16_t displayBrightness = sleetClock.state.potentiometer - sleetClock.state.illuminance;
-        if(displayBrightness < 0)
-            displayBrightness = 0;
-        else if(displayBrightness > 4095 )
-            displayBrightness = 4095;
-        sleetClock.analogWrite(sleetClock.displayBacklight, displayBrightness);
-
+        
         static int resetCounter = 0;
         if(digitalRead(sleetClock.button0)) {
             ++resetCounter;
@@ -88,13 +85,43 @@ void printInfo(void *arg) {
                 ESP.restart();
             }
         }
+
+        sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[sleetClock.state.cursor].weather);
+        int16_t displayBrightness = sleetClock.state.potentiometer - sleetClock.state.illuminance;
+        if(displayBrightness < 0)
+            displayBrightness = 0;
+        else if(displayBrightness > 4095 )
+            displayBrightness = 4095;
+        sleetClock.analogWrite(sleetClock.displayBacklight, displayBrightness);
+
+        vTaskDelayUntil( &xLastWakeTime, xPeriod ); //Wait for the next cycle.
+    }
+}
+
+void updateLcdBacklight(void *arg) {
+    TickType_t xLastWakeTime;
+    const TickType_t xPeriod = 1000 / portTICK_PERIOD_MS;
+    xLastWakeTime = xTaskGetTickCount();
+    for(;;) {
+        int16_t displayBrightness = sleetClock.state.potentiometer - sleetClock.state.illuminance;
+        if(displayBrightness < 0)
+            displayBrightness = 0;
+        else if(displayBrightness > 4095 )
+            displayBrightness = 4095;
+        sleetClock.analogWrite(sleetClock.displayBacklight, displayBrightness);
+        vTaskDelayUntil( &xLastWakeTime, xPeriod ); //Wait for the next cycle.
     }
 }
 
 void setup() {
     Serial.begin(115200);
     sleetClock.init();
-    sleetClock.drawLogo();
+    sleetClock.drawConnecting(deviceName);
+
+    preferences.begin("darkSkyProps", false);
+    apiKey = preferences.getString("apiKey", "646f7e8e4fb6b4a169d193a8cc67ee2f");
+    latitude = preferences.getString("latitude", "49.195084");  //Brno main square
+    longitude = preferences.getString("latitude", "16.608140"); //Brno main square
 
     new (&darkSkyApiKey) WiFiManagerParameter("darkSkyKeyId", "Dark Sky API key", "", darkSkyApiKeyLength, "placeholder=\"GUID\"");
     new (&coordinatesLatitude) WiFiManagerParameter("coordinateLatitude", "Coordinate Latitude", "", latitudeLongitudeLength, "placeholder=\"49.195084\"");
@@ -104,12 +131,13 @@ void setup() {
     wm.addParameter(&coordinatesLatitude);
     wm.addParameter(&coordinatesLongtitude);
     wm.setSaveParamsCallback(saveParamCallback);
+    wm.setHostname(deviceName);
 
     const char* menu[] = {"wifi","param","sep","exit"}; 
     wm.setMenu(menu,4);
     
     bool res;
-    res = wm.autoConnect("SleetClock");
+    res = wm.autoConnect(deviceName);
 
     if(!res) {
         Serial.println("Failed to connect or hit timeout");
@@ -120,7 +148,10 @@ void setup() {
     }
     dsParser.begin(apiKey.c_str(), latitude.c_str(), longitude.c_str());
     configTime(tz, 0, ntpServer1, ntpServer2, ntpServer3);
-    xTaskCreate(printInfo, "printInfo", 2048, NULL, 1, NULL);
+    preferences.end();
+
+    xTaskCreate(printInfo, "printInfo", 2048, NULL, 2, NULL);
+    xTaskCreate(updateLcdBacklight, "updateLcdBacklight", 2048, NULL, 1, NULL);
 }
 
 void loop() {
