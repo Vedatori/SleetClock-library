@@ -22,8 +22,8 @@ const char *ntpServer3 = "2.pool.ntp.org";
 
 WiFiManager wm; // global wm instance
 WiFiManagerParameter darkSkyApiKey; // global param ( for non blocking w params )
-WiFiManagerParameter coordinatesLatitude; 
-WiFiManagerParameter coordinatesLongtitude; 
+WiFiManagerParameter coordinatesLatitude;
+WiFiManagerParameter coordinatesLongtitude;
 
 String getParam(String name){
     //read parameter from server, for customhmtl input
@@ -85,22 +85,13 @@ void printInfo(void *arg) {
                 ESP.restart();
             }
         }
-
-        sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[sleetClock.state.cursor].weather);
-        int16_t displayBrightness = sleetClock.state.potentiometer - sleetClock.state.illuminance;
-        if(displayBrightness < 0)
-            displayBrightness = 0;
-        else if(displayBrightness > 4095 )
-            displayBrightness = 4095;
-        sleetClock.analogWrite(sleetClock.displayBacklight, displayBrightness);
-
         vTaskDelayUntil( &xLastWakeTime, xPeriod ); //Wait for the next cycle.
     }
 }
 
 void updateLcdBacklight(void *arg) {
     TickType_t xLastWakeTime;
-    const TickType_t xPeriod = 1000 / portTICK_PERIOD_MS;
+    const TickType_t xPeriod = 500 / portTICK_PERIOD_MS;
     xLastWakeTime = xTaskGetTickCount();
     for(;;) {
         int16_t displayBrightness = sleetClock.state.potentiometer - sleetClock.state.illuminance;
@@ -121,7 +112,7 @@ void setup() {
     preferences.begin("darkSkyProps", false);
     apiKey = preferences.getString("apiKey", "646f7e8e4fb6b4a169d193a8cc67ee2f");
     latitude = preferences.getString("latitude", "49.195084");  //Brno main square
-    longitude = preferences.getString("latitude", "16.608140"); //Brno main square
+    longitude = preferences.getString("longitude", "16.608140"); //Brno main square
 
     new (&darkSkyApiKey) WiFiManagerParameter("darkSkyKeyId", "Dark Sky API key", "", darkSkyApiKeyLength, "placeholder=\"GUID\"");
     new (&coordinatesLatitude) WiFiManagerParameter("coordinateLatitude", "Coordinate Latitude", "", latitudeLongitudeLength, "placeholder=\"49.195084\"");
@@ -151,7 +142,7 @@ void setup() {
     preferences.end();
 
     xTaskCreate(printInfo, "printInfo", 2048, NULL, 2, NULL);
-    xTaskCreate(updateLcdBacklight, "updateLcdBacklight", 2048, NULL, 1, NULL);
+    xTaskCreate(updateLcdBacklight, "updateLcdBacklight", 2048, NULL, 2, NULL);
 }
 
 void loop() {
