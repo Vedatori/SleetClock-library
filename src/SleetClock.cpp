@@ -40,15 +40,17 @@ void SleetClock::init() {
 }
 
 void SleetClock::analogWrite(uint8_t pcaPin, uint16_t value) {
+    if(pcaPinsPwmState[pcaPin] == value)
+        return;
     if(value > 4095)
         value = 4095;
-    
     pwm.setPWM(pcaPin, 0, value);
+    pcaPinsPwmState[pcaPin] = value;
 }
 
 void SleetClock::allOff() {
     for(uint8_t pin = 0; pin < 16; ++pin) {
-        this->analogWrite(pin, 0);
+        analogWrite(pin, 0);
     }
 }
 
@@ -83,6 +85,7 @@ void SleetClock::drawConnecting(const char * ssid) {
     display.drawStr(0, 22, "Connecting to WiFi...");
     display.drawStr(0, 34, " If unsuccessful find");
     display.drawStr(0, 46, ssid);
+
     display.sendBuffer();
 }
 
@@ -143,7 +146,7 @@ void SleetClock::drawForecast(struct tm timeNow, int8_t hoursOffset, float outTe
     display.sendBuffer();
 }
 
-void SleetClock::setAllWeatherLedsToZero(){
+void SleetClock::setAllWeatherLedsToZero() {
     analogWrite(ligthningLED, 0);
     analogWrite(flakesLED, 0);
     analogWrite(dropsLED, 0);
@@ -152,109 +155,80 @@ void SleetClock::setAllWeatherLedsToZero(){
     analogWrite(rgbG, 0);
     analogWrite(rgbB, 0);
 }
-void SleetClock::showWeatherOnLeds(Weather weather){
-    //Serial.print((int)weather);
-    //Serial.print('\t');
-
+void SleetClock::showWeatherOnLeds(Weather weather) {
+    static unsigned animationStep = 0;
     if(previousWeather != weather) {
         previousWeather = weather;
         animationStep = 0;
-        setAllWeatherLedsToZero();
     }
-    //Serial.print(animationStep);
-    //Serial.println('\t');
     switch (weather)
     {
         case CLEAR_DAY:
-            analogWrite(rgbR, 4095);
-            analogWrite(rgbG, 1525);
+            showWeatherSegment(clearDayLeds);
             break;
         case CLEAR_NIGHT:
-            analogWrite(rgbR, 4095);
-            analogWrite(rgbG, 1523);
-            analogWrite(rgbB, 2300);
+            showWeatherSegment(clearNightLeds);
             break;
         case CLOUDY:
-            analogWrite(cloudLED, 500);
+            showWeatherSegment(cloudyLeds);
             break;
         case RAIN:
-            analogWrite(cloudLED, 500);
-            if(animationStep % 4 == 0){
-                analogWrite(dropsLED, 2048);
-            }
-            else{
-                analogWrite(dropsLED, 0);
+            if(animationStep < 15)
+                showWeatherSegment(rainLeds[0]);
+            else {    
+                showWeatherSegment(rainLeds[1]);
+                if(animationStep > 30)
+                    animationStep = 0;
             }
             break;
         case HEAVY_RAIN:
-            analogWrite(cloudLED, 500);
-            if(animationStep % 2 == 0){
-                analogWrite(dropsLED, 2048);
-                analogWrite(ligthningLED, 0);
-            }
-            else if(animationStep % 3 == 0){
-                analogWrite(dropsLED, 0);
-                analogWrite(ligthningLED, 4096);
-            }
-            else{
-                analogWrite(dropsLED, 0);
-                analogWrite(ligthningLED, 0);
+            if(animationStep < 10)
+                showWeatherSegment(heavyRainLeds[0]);
+            else if(animationStep < 12)
+                showWeatherSegment(heavyRainLeds[1]);
+            else {
+                showWeatherSegment(heavyRainLeds[2]);
+                if(animationStep > 30)
+                    animationStep = 0;
             }
             break;
         case SNOW:
-            analogWrite(cloudLED, 500);
-            if(animationStep % 3 == 0){
-                analogWrite(flakesLED, 300);
-            }
-            else{
-                analogWrite(flakesLED, 0);
+            if(animationStep < 20)
+                showWeatherSegment(snowLeds[0]);
+            else {    
+                showWeatherSegment(snowLeds[1]);
+                if(animationStep > 30)
+                    animationStep = 0;
             }
             break;
         case SLEET:
-            analogWrite(cloudLED, 500);
-            if(animationStep % 8 == 4){
-                analogWrite(flakesLED, 300);
-                analogWrite(dropsLED, 0);
+            if(animationStep < 10)
+                showWeatherSegment(sleetLeds[0]);
+            else if(animationStep < 20)
+                showWeatherSegment(sleetLeds[1]);
+            else {
+                showWeatherSegment(sleetLeds[2]);
+                if(animationStep > 30)
+                    animationStep = 0;
             }
-            else if(animationStep % 4 == 0){
-                analogWrite(flakesLED, 0);
-                analogWrite(dropsLED, 2048);
-            }
-            else{
-                analogWrite(flakesLED, 0);
-                analogWrite(dropsLED, 0);
-            }
-
             break;
         case WIND:
-            if(animationStep > 10){
-                animationStep = 0;
+            if(animationStep < 15)
+                showWeatherSegment(windLeds[0]);
+            else {    
+                showWeatherSegment(windLeds[1]);
+                if(animationStep > 30)
+                    animationStep = 0;
             }
-            if(animationStep < 5){
-                analogWrite(cloudLED, 100*(animationStep+1));
-            }
-            else{
-                analogWrite(cloudLED, (10-animationStep+1)*100);
-            }
-            analogWrite(rgbR, 0);
-            analogWrite(rgbG, 0);
-            analogWrite(rgbB, 0);
             break;
         case FOG:
-            analogWrite(cloudLED, 500);
-            analogWrite(rgbR, 400);
-            analogWrite(rgbG, 200);
+            showWeatherSegment(fogLeds);
             break;
         case PARTLY_CLOUDY_DAY:
-            analogWrite(rgbR, 4095);
-            analogWrite(rgbG, 1525);
-            analogWrite(cloudLED, 200);
+            showWeatherSegment(partlyCloudyDayLeds);
             break;
         case PARTLY_CLOUDY_NIGHT:
-            analogWrite(rgbR, 4095);
-            analogWrite(rgbG, 1523);
-            analogWrite(rgbB, 2300);
-            analogWrite(cloudLED, 200);
+            showWeatherSegment(partlyCloudyNightLeds);
             break;
         case UNAVAILABLE:
             setAllWeatherLedsToZero();
@@ -269,45 +243,58 @@ void SleetClock::showWeatherOnLeds(Weather weather){
     animationStep++;
 }
 
-void SleetClock::setBuzzerOff(){
+void SleetClock::showWeatherSegment(const int16_t * weatherLedsSegment) {
+    for(int i = 0; i < 7; ++i) {
+        int16_t difference = weatherLedsSegment[i] - pcaPinsPwmState[i];
+        bool falling = difference < 0;
+        if(difference > weatherLedSteps[falling][i])
+            analogWrite(i, pcaPinsPwmState[i] + weatherLedSteps[falling][i]);
+        else if(difference < -weatherLedSteps[falling][i])
+            analogWrite(i, pcaPinsPwmState[i] - weatherLedSteps[falling][i]);
+        else
+            analogWrite(i, pcaPinsPwmState[i] + difference);
+    }
+}
+
+void SleetClock::setBuzzerOff() {
     setBuzzerLevel(0);
 }
 
-void SleetClock::setBuzzerOn(){
+void SleetClock::setBuzzerOn() {
     setBuzzerLevel(1500);
 }
 
-void SleetClock::setBuzzerLevel(unsigned level){    
+void SleetClock::setBuzzerLevel(unsigned level) {    
     analogWrite(buzzer, level);
 }
 
-void SleetClock::setRedLevel(unsigned level){
+void SleetClock::setRedLevel(unsigned level) {
     analogWrite(rgbR, level);
 }
 
-void SleetClock::setGreenLevel(unsigned level){
+void SleetClock::setGreenLevel(unsigned level) {
     analogWrite(rgbG, level);
 }
 
-void SleetClock::setBlueLevel(unsigned level){
+void SleetClock::setBlueLevel(unsigned level) {
     analogWrite(rgbB, level);
 }
 
-void SleetClock::setLigthningLEDLevel(unsigned level){
+void SleetClock::setLigthningLEDLevel(unsigned level) {
     analogWrite(ligthningLED, level);
 }
-void SleetClock::setFlakesLEDLevel(unsigned level){
+void SleetClock::setFlakesLEDLevel(unsigned level) {
     analogWrite(flakesLED, level);
 }
 
-void SleetClock::setDropsLEDLevel(unsigned level){
+void SleetClock::setDropsLEDLevel(unsigned level) {
     analogWrite(dropsLED, level);
 }
 
-void SleetClock::setCloudLEDLevel(unsigned level){
+void SleetClock::setCloudLEDLevel(unsigned level) {
     analogWrite(cloudLED, level);
 }
-void SleetClock::updateTemp(void * args){
+void SleetClock::updateTemp(void * args) {
     TickType_t xLastWakeTime;
     const TickType_t xPeriod = 1000 / portTICK_PERIOD_MS;
     xLastWakeTime = xTaskGetTickCount();

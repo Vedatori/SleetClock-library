@@ -51,7 +51,7 @@ void printInfo(void *arg) {
     struct tm timeInfo;
 
     TickType_t xLastWakeTime;
-    const TickType_t xPeriod = 100 / portTICK_PERIOD_MS;
+    const TickType_t xPeriod = 50 / portTICK_PERIOD_MS;
     xLastWakeTime = xTaskGetTickCount ();
 
     for(;;) {
@@ -76,7 +76,7 @@ void printInfo(void *arg) {
             }
         }
         sleetClock.showWeatherOnLeds((Weather)dsParser.weatherData[sleetClock.state.cursor].weather);
-        
+
         static int resetCounter = 0;
         if(digitalRead(sleetClock.button0)) {
             ++resetCounter;
@@ -85,21 +85,13 @@ void printInfo(void *arg) {
                 ESP.restart();
             }
         }
-        vTaskDelayUntil( &xLastWakeTime, xPeriod ); //Wait for the next cycle.
-    }
-}
-
-void updateLcdBacklight(void *arg) {
-    TickType_t xLastWakeTime;
-    const TickType_t xPeriod = 500 / portTICK_PERIOD_MS;
-    xLastWakeTime = xTaskGetTickCount();
-    for(;;) {
         int16_t displayBrightness = sleetClock.state.potentiometer - sleetClock.state.illuminance;
         if(displayBrightness < 0)
             displayBrightness = 0;
         else if(displayBrightness > 4095 )
             displayBrightness = 4095;
         sleetClock.analogWrite(sleetClock.displayBacklight, displayBrightness);
+
         vTaskDelayUntil( &xLastWakeTime, xPeriod ); //Wait for the next cycle.
     }
 }
@@ -108,11 +100,12 @@ void setup() {
     Serial.begin(115200);
     sleetClock.init();
     sleetClock.drawConnecting(deviceName);
+    sleetClock.analogWrite(sleetClock.displayBacklight, 4095);
 
     preferences.begin("darkSkyProps", false);
     apiKey = preferences.getString("apiKey", "646f7e8e4fb6b4a169d193a8cc67ee2f");
-    latitude = preferences.getString("latitude", "49.195084");  //Brno main square
-    longitude = preferences.getString("longitude", "16.608140"); //Brno main square
+    latitude = preferences.getString("latitude", "49.195084");  //Brno main square as default
+    longitude = preferences.getString("longitude", "16.608140"); //Brno main square as default
 
     new (&darkSkyApiKey) WiFiManagerParameter("darkSkyKeyId", "Dark Sky API key", "", darkSkyApiKeyLength, "placeholder=\"GUID\"");
     new (&coordinatesLatitude) WiFiManagerParameter("coordinateLatitude", "Coordinate Latitude", "", latitudeLongitudeLength, "placeholder=\"49.195084\"");
@@ -124,7 +117,7 @@ void setup() {
     wm.setSaveParamsCallback(saveParamCallback);
     wm.setHostname(deviceName);
 
-    const char* menu[] = {"wifi","param","sep","exit"}; 
+    const char* menu[] = {"wifi","param","sep","exit"};
     wm.setMenu(menu,4);
     
     bool res;
@@ -142,7 +135,6 @@ void setup() {
     preferences.end();
 
     xTaskCreate(printInfo, "printInfo", 2048, NULL, 2, NULL);
-    xTaskCreate(updateLcdBacklight, "updateLcdBacklight", 2048, NULL, 2, NULL);
 }
 
 void loop() {
