@@ -29,7 +29,7 @@ enum Weather{
 class SleetClock {
     Adafruit_PWMServoDriver pwm;
     Weather previousWeather = INITIAL;
-    const int16_t clearDayLeds[7] = {0, 0, 0, 0, 4095, 1525, 500};   //[ligthningLED, flakesLED, dropsLED, cloudLED, rgbR, rgbG, rgbB]
+    const int16_t clearDayLeds[7] = {0, 0, 0, 0, 4095, 1200, 150};   //[ligthningLED, flakesLED, dropsLED, cloudLED, rgbR, rgbG, rgbB]
     const int16_t clearNightLeds[7] = {0, 0, 0, 0, 4095, 1525, 2300};
     const int16_t cloudyLeds[7] = {0, 0, 0, 500, 0, 0, 0};
     const int16_t rainLeds[2][7] = {{0, 0, 2048, 500, 0, 0, 0}, {0, 0, 500, 500, 0, 0, 0}};
@@ -37,8 +37,8 @@ class SleetClock {
     const int16_t snowLeds[2][7] = {{0, 300, 0, 500, 0, 0, 0}, {0, 100, 0, 500, 0, 0, 0}};
     const int16_t sleetLeds[3][7] = {{0, 300, 0, 500, 0, 0, 0}, {0, 0, 2048, 500, 0, 0, 0}, {0, 0, 0, 500, 0, 0, 0}};
     const int16_t windLeds[2][7] = {{0, 0, 0, 1000, 0, 0, 0}, {0, 0, 0, 300, 0, 0, 0}};
-    const int16_t fogLeds[7] = {0, 0, 0, 500, 400, 200, 0};
-    const int16_t partlyCloudyDayLeds[7] = {0, 0, 0, 200, 4095, 1525, 0};
+    const int16_t fogLeds[7] = {0, 0, 0, 800, 0, 0, 0};
+    const int16_t partlyCloudyDayLeds[7] = {0, 0, 0, 300, 4095, 1200, 150};
     const int16_t partlyCloudyNightLeds[7] = {0, 0, 0, 200, 4095, 1523, 2300};
     const int16_t weatherLedSteps[2][7] = {{4095, 30, 200, 60, 250, 150, 150}, {250, 20, 150, 60, 250, 150, 150}};   //[Up, Down][ligthningLED, flakesLED, dropsLED, cloudLED, rgbR, rgbG, rgbB]
     int16_t pcaPinsPwmState[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
